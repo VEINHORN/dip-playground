@@ -4,29 +4,26 @@ var canvas = document.getElementById("viewport");
 var inpHistogramCanvas = document.getElementById("input_histogram");
 var outHistogramCanvas = document.getElementById("output_histogram");
 
-var width = canvas.width;
-var height = canvas.height;
-
-var context = canvas.getContext("2d");
-
 window.onload = function() {
   loadImage();
 }
 
 function loadImage() {
+  var ctx = canvas.getContext("2d");
+
   var image = new Image();
   image.src = 'images/lenna.png';
 
   image.onload = function() {
-    context.drawImage(image, 0, 0);
+    ctx.drawImage(image, 0, 0);
 
-    var imageData = context.getImageData(0, 0, width, height);
+    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
     drawHistogram(imageData, inpHistogramCanvas);
 
-    linearCorrection(imageData);
+    linearCorrection(ctx, imageData);
 
-    var data = context.getImageData(0, 0, width, height).data;
+    imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     drawHistogram(imageData, outHistogramCanvas);
   }
 }
@@ -34,7 +31,7 @@ function loadImage() {
 function drawHistogram(imageData, canv) {
   var ctx = canv.getContext("2d");
 
-  var histogram = createHistogram(imageData);//, width, height);
+  var histogram = createHistogram(imageData);
   var max = findMax(histogram);
 
   var normalizedHistogram = normalizeHistogram(histogram, canv.height, max);
@@ -49,7 +46,7 @@ function createHistogram(imageData, w, h) {
   for(var i = 0; i < 256; i++) histogram[i] = 0; // init histogram
   for(var i = 0; i < imageData.height; i++) {
     for(var j = 0; j < imageData.width; j++) {
-      var pixel = getPixel(data, j, i);
+      var pixel = getPixel(imageData, j, i);
       histogram[Math.round(0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue)]++;
     }
   }
@@ -80,36 +77,38 @@ function findMax(array) {
   return max;
 }
 
-function linearCorrection(imageData) {
+function linearCorrection(ctx, imageData) {
   var data = imageData.data;
-  for(var i = 0; i < height; i++) {
-    for(var j = 0; j < width; j++) {
-      var pixel = getPixel(data, j, i);
-      pixel.red = 0;
-      pixel.green = 0;
-      //pixel.blue = 0;
-      setPixel(data, j, i, pixel);
+  for(var i = 0; i < imageData.height; i++) {
+    for(var j = 0; j < imageData.width; j++) {
+      var pixel = getPixel(imageData, j, i);
+      pixel.red += 50;
+      pixel.green += 50;
+      pixel.blue += 50;
+      setPixel(imageData, j, i, pixel);
     }
   }
-  context.putImageData(imageData, 0, 0);
+  ctx.putImageData(imageData, 0, 0);
 }
 
 // data - is an array of int (r,g,b,a,...etc) ImageData.data by the way
-function setPixel(data, x, y, pixel) {
-  var i = getPixelPos(x, y);
+function setPixel(imageData, x, y, pixel) {
+  var i = getPixelPos(imageData, x, y);
+  var data = imageData.data;
   data[i] = pixel.red;
   data[i + 1] = pixel.green;
   data[i + 2] = pixel.blue;
   data[i + 3] = pixel.alpha;
 }
 
-function getPixel(data, x, y) {
-  var i = getPixelPos(x, y);
+function getPixel(imageData, x, y) {
+  var i = getPixelPos(imageData, x, y);
+  var data = imageData.data;
   return new Pixel(data[i], data[i + 1], data[i + 2], data[i + 3]);
 }
 
-function getPixelPos(x, y) {
-  return 4 * (height * y + x);
+function getPixelPos(imageData, x, y) {
+  return 4 * (imageData.height * y + x);
 }
 
 class Pixel {
