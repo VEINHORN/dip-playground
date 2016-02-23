@@ -21,27 +21,39 @@ function loadImage() {
     context.drawImage(image, 0, 0);
 
     var imageData = context.getImageData(0, 0, width, height);
-    var data = imageData.data;
 
-    drawHistogram(data, inpHistogramCanvas);
+    drawHistogram(imageData, inpHistogramCanvas);
 
     linearCorrection(imageData);
 
     var data = context.getImageData(0, 0, width, height).data;
-    drawHistogram(data, outHistogramCanvas);
+    drawHistogram(imageData, outHistogramCanvas);
   }
 }
 
 function drawHistogram(imageData, canv) {
   var ctx = canv.getContext("2d");
 
-  var histogram = createHistogram(imageData, width, height);
+  var histogram = createHistogram(imageData);//, width, height);
   var max = findMax(histogram);
 
   var normalizedHistogram = normalizeHistogram(histogram, canv.height, max);
   for(var i = 0; i < normalizedHistogram.length; i++) {
     drawLine(ctx, canv.height, i, normalizedHistogram[i]);
   }
+}
+
+function createHistogram(imageData, w, h) {
+  var data = imageData.data;
+  var histogram = [];
+  for(var i = 0; i < 256; i++) histogram[i] = 0; // init histogram
+  for(var i = 0; i < imageData.height; i++) {
+    for(var j = 0; j < imageData.width; j++) {
+      var pixel = getPixel(data, j, i);
+      histogram[Math.round(0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue)]++;
+    }
+  }
+  return histogram;
 }
 
 // index is one of 255 columns
@@ -80,18 +92,6 @@ function linearCorrection(imageData) {
     }
   }
   context.putImageData(imageData, 0, 0);
-}
-
-function createHistogram(data, w, h) {
-  var histogram = [];
-  for(var i = 0; i < 256; i++) histogram[i] = 0; // init histogram
-  for(var i = 0; i < h; i++) {
-    for(var j = 0; j < w; j++) {
-      var pixel = getPixel(data, j, i);
-      histogram[Math.round(0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue)]++;
-    }
-  }
-  return histogram;
 }
 
 // data - is an array of int (r,g,b,a,...etc) ImageData.data by the way
