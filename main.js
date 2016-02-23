@@ -21,7 +21,7 @@ function loadImage() {
 
     drawHistogram(imageData, inpHistogramCanvas);
 
-    linearCorrection(ctx, imageData);
+    linearCorrection(ctx, imageData, 240, 270);
 
     imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     drawHistogram(imageData, outHistogramCanvas);
@@ -77,18 +77,21 @@ function findMax(array) {
   return max;
 }
 
-function linearCorrection(ctx, imageData) {
-  var data = imageData.data;
+function linearCorrection(ctx, imageData, min, max) {
   for(var i = 0; i < imageData.height; i++) {
     for(var j = 0; j < imageData.width; j++) {
       var pixel = getPixel(imageData, j, i);
-      pixel.red += 50;
-      pixel.green += 50;
-      pixel.blue += 50;
+      pixel.red = linearTransformation(pixel.red, min, max);
+      pixel.green = linearTransformation(pixel.green, min, max);
+      pixel.blue = linearTransformation(pixel.blue, min, max);
       setPixel(imageData, j, i, pixel);
     }
   }
   ctx.putImageData(imageData, 0, 0);
+}
+
+function linearTransformation(value, min, max) {
+  return (value - min) * ((255 - 0) / (max - min));
 }
 
 // data - is an array of int (r,g,b,a,...etc) ImageData.data by the way
