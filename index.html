@@ -1,15 +1,22 @@
 <html>
   <head>
     <title>Digital image processing</title>
-    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" type="text/css" href="css/libs/buttons.css">
+    <link rel="stylesheet" type="text/css" href="css/index.css">
   </head>
   <body>
     <div id="wrapper">
       <div>
-        <img src="images/lenna.png">
+        <img src="images/lenna.png" id="input-image">
       </div>
       <div>
         <canvas id="viewport" width="512" height="512"></canvas>
+      </div>
+      <div id="control">
+        <div>
+          <input type="text" id="url-input">
+          <a href="#" id="load-btn" class="button button-rounded button-flat-royal">Load</a>
+        </div>
       </div>
     </div>
     <div id="histogram_wrapper">

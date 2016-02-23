@@ -4,8 +4,26 @@ var canvas = document.getElementById("viewport");
 var inpHistogramCanvas = document.getElementById("input_histogram");
 var outHistogramCanvas = document.getElementById("output_histogram");
 
+
 window.onload = function() {
   loadImage();
+  // create downloading images on server and than setup to canvas
+  var loadBtn = document.getElementById("load-btn");
+  loadBtn.onclick = function() {
+    var urlInput = document.getElementById("url-input");
+    var url = urlInput.value;
+    var imgElm = document.getElementById("input-image");
+    imgElm.src = url;
+
+    canvas.width = imgElm.width;
+    canvas.height = imgElm.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(imgElm, 0, 0, canvas.width, canvas.height);
+    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    drawHistogram(imageData, inpHistogramCanvas);
+    drawHistogram(imageData, outHistogramCanvas);
+  }
 }
 
 function loadImage() {
@@ -21,7 +39,7 @@ function loadImage() {
 
     drawHistogram(imageData, inpHistogramCanvas);
 
-    linearCorrection(ctx, imageData, 240, 270);
+    linearCorrection(ctx, imageData, 220, 255);
 
     imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     drawHistogram(imageData, outHistogramCanvas);
