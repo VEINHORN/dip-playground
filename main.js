@@ -9,7 +9,7 @@ window.onload = function() {
   loadImage();
   // create downloading images on server and than setup to canvas
   var loadBtn = document.getElementById("load-btn");
-  loadBtn.onclick = function() {
+  /*loadBtn.onclick = function() {
     var urlInput = document.getElementById("url-input");
     var url = urlInput.value;
     var imgElm = document.getElementById("input-image");
@@ -23,7 +23,48 @@ window.onload = function() {
 
     drawHistogram(imageData, inpHistogramCanvas);
     drawHistogram(imageData, outHistogramCanvas);
+  }*/
+  loadBtn.onclick = function() {
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    loadImage();
   }
+
+  $("#linear-correction-slider").ionRangeSlider({
+    type: "double",
+    grid: true,
+    min: 0,
+    max: 255,
+    from: 150,
+    to: 200,
+    onChange: function(data) {
+      var ctx = canvas.getContext("2d");
+      var histCtx = outHistogramCanvas.getContext("2d"); // context of output histogram
+      var image = new Image();
+      image.src = 'images/lenna.png';
+
+      image.onload = function() {
+        ctx.drawImage(image, 0, 0);
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        linearCorrection(ctx, imageData, data.from, data.to);
+        imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        histCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height)
+        drawHistogram(imageData, outHistogramCanvas);
+      }
+      /*var ctx = canvas.getContext("2d");
+      var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      linearCorrection(ctx, imageData, data.from, data.to);
+
+      var histoCtx = outHistogramCanvas.getContext("2d");
+      histoCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height);
+      drawHistogram(imageData, outHistogramCanvas);
+      */
+      console.log(data);
+    }
+  });
 }
 
 function loadImage() {
@@ -39,7 +80,7 @@ function loadImage() {
 
     drawHistogram(imageData, inpHistogramCanvas);
 
-    linearCorrection(ctx, imageData, 220, 255);
+    //linearCorrection(ctx, imageData, 180, 255);
 
     imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     drawHistogram(imageData, outHistogramCanvas);

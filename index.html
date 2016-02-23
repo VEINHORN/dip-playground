@@ -2,6 +2,8 @@
   <head>
     <title>Digital image processing</title>
     <link rel="stylesheet" type="text/css" href="css/libs/buttons.css">
+    <link rel="stylesheet" type="text/css" href="css/libs/ion.rangeSlider.css">
+    <link rel="stylesheet" type="text/css" href="css/libs/ion.rangeSlider.skinFlat.css">
     <link rel="stylesheet" type="text/css" href="css/index.css">
   </head>
   <body>
@@ -16,6 +18,8 @@
         <div>
           <input type="text" id="url-input">
           <a href="#" id="load-btn" class="button button-rounded button-flat-royal">Load</a>
+          <span>Linear correction:</span>
+          <div id="linear-correction-slider"></div>
         </div>
       </div>
     </div>
@@ -27,6 +31,8 @@
         <canvas class="histogram" id="output_histogram" width="255" height="150" style="background: red;"></canvas>
       </div>
     </div>
+    <script src="js/libs/jquery.min.js"></script>
+    <script src="js/libs/ion.rangeSlider.min.js"></script>
     <script src="main.js"></script>
   </body>
 </html>
