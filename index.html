@@ -9,7 +9,7 @@
   <body>
     <div id="wrapper">
       <div>
-        <img src="images/lenna.png" id="input-image">
+        <img id="input-image">
       </div>
       <div>
         <canvas id="viewport" width="512" height="512"></canvas>
@@ -18,8 +18,11 @@
         <div>
           <input type="text" id="url-input">
           <a href="#" id="load-btn" class="button button-rounded button-flat-royal">Load</a>
-          <span>Linear correction:</span>
+
+          <p>Linear correction:</p>
           <div id="linear-correction-slider"></div>
+          <p>Gamma correction:</p>
+          <div id="gamma-correction-slider"></div>
         </div>
       </div>
     </div>

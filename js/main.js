@@ -4,8 +4,13 @@ var canvas = document.getElementById("viewport");
 var inpHistogramCanvas = document.getElementById("input_histogram");
 var outHistogramCanvas = document.getElementById("output_histogram");
 
+//var image_path = "images/lenna.png";
+var image_path = "images/water.jpg";
 
 window.onload = function() {
+  var imgElm = document.getElementById("input-image");
+  imgElm.src = image_path;
+
   loadImage();
   // create downloading images on server and than setup to canvas
   var loadBtn = document.getElementById("load-btn");
@@ -39,29 +44,51 @@ window.onload = function() {
     to: 200,
     onChange: function(data) {
       var ctx = canvas.getContext("2d");
-      var histCtx = outHistogramCanvas.getContext("2d"); // context of output histogram
+      var outHistCtx = outHistogramCanvas.getContext("2d"); // context of output histogram
       var image = new Image();
-      image.src = 'images/lenna.png';
+      image.src = image_path;
 
       image.onload = function() {
+        canvas.width = image.width;
+        canvas.height = image.height;
         ctx.drawImage(image, 0, 0);
+
         var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
         linearCorrection(ctx, imageData, data.from, data.to);
-        imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-        histCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height)
+        imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        outHistCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height)
         drawHistogram(imageData, outHistogramCanvas);
       }
-      /*var ctx = canvas.getContext("2d");
-      var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      linearCorrection(ctx, imageData, data.from, data.to);
+      console.log(data);
+    }
+  });
 
-      var histoCtx = outHistogramCanvas.getContext("2d");
-      histoCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height);
-      drawHistogram(imageData, outHistogramCanvas);
-      */
+  $("#gamma-correction-slider").ionRangeSlider({
+    grid: true,
+    from: 0.01,
+    to: 7.99,
+    step: 0.05,
+    min: 0.01,
+    max: 7.99,
+    onChange: function(data) {
+      var ctx = canvas.getContext("2d");
+      var outHistCtx = outHistogramCanvas.getContext("2d"); // context of output histogram
+      var image = new Image();
+      image.src = image_path;
+
+      image.onload = function() {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        ctx.drawImage(image, 0, 0);
+
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        gammaCorrection(ctx, imageData, data.from);
+
+        imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        outHistCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height)
+        drawHistogram(imageData, outHistogramCanvas);
+      }
       console.log(data);
     }
   });
@@ -71,9 +98,11 @@ function loadImage() {
   var ctx = canvas.getContext("2d");
 
   var image = new Image();
-  image.src = 'images/lenna.png';
+  image.src = image_path;
 
   image.onload = function() {
+    canvas.width = image.width;
+    canvas.height = image.height;
     ctx.drawImage(image, 0, 0);
 
     var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -134,6 +163,24 @@ function findMax(array) {
     if(max < array[i]) max = array[i];
   }
   return max;
+}
+
+function gammaCorrection(ctx, imageData, gamma) {
+  for(var i = 0; i < imageData.height; i++) {
+    for(var j = 0; j < imageData.width; j++) {
+      var pixel = getPixel(imageData, j, i);
+      pixel.red = gammaTransformation(pixel.red, gamma);
+      pixel.green = gammaTransformation(pixel.green, gamma);
+      pixel.blue = gammaTransformation(pixel.blue, gamma);
+      setPixel(imageData, j, i, pixel);
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function gammaTransformation(value, gamma) {
+  var correction = 1 / gamma;
+  return 255 * Math.pow(value / 255, correction);
 }
 
 function linearCorrection(ctx, imageData, min, max) {
