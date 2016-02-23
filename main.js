@@ -37,24 +37,25 @@ function drawHistogram(imageData, canv) {
 
   var histogram = createHistogram(imageData, width, height);
   var max = findMax(histogram);
-  var normalizedHistogram = normalizeHistogram(histogram, max);
 
+  var normalizedHistogram = normalizeHistogram(histogram, canv.height, max);
   for(var i = 0; i < normalizedHistogram.length; i++) {
-    drawLine(ctx, i, normalizedHistogram[i]);
+    drawLine(ctx, canv.height, i, normalizedHistogram[i]);
   }
 }
 
-function drawLine(ctx, num, value) {
+// index is one of 255 columns
+function drawLine(ctx, height, index, value) {
   ctx.beginPath();
-  ctx.moveTo(num, 255);
-  ctx.lineTo(num, 255 - value);
+  ctx.moveTo(index, height);
+  ctx.lineTo(index, height - value);
   ctx.stroke();
 }
 
-function normalizeHistogram(histogram, max) {
+function normalizeHistogram(histogram, height, max) {
   var normalized = [];
   for(var i = 0; i < histogram.length; i++) {
-    normalized[i] = Math.round(255 * (histogram[i] / max));
+    normalized[i] = Math.round(height * (histogram[i] / max));
   }
   return normalized;
 }
