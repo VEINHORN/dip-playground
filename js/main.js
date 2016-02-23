@@ -60,7 +60,7 @@ window.onload = function() {
         outHistCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height)
         drawHistogram(imageData, outHistogramCanvas);
       }
-      console.log(data);
+      //console.log(data);
     }
   });
 
@@ -89,7 +89,36 @@ window.onload = function() {
         outHistCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height)
         drawHistogram(imageData, outHistogramCanvas);
       }
-      console.log(data);
+      //console.log(data);
+    }
+  });
+
+  $("#logarithm-correction-slider").ionRangeSlider({
+    grid: true,
+    from: 0.01,
+    to: 100,
+    step: 0.2,
+    min: 0.01,
+    max: 100,
+    onChange: function(data) {
+      var ctx = canvas.getContext("2d");
+      var outHistCtx = outHistogramCanvas.getContext("2d"); // context of output histogram
+      var image = new Image();
+      image.src = image_path;
+
+      image.onload = function() {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        ctx.drawImage(image, 0, 0);
+
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        logarithmCorrection(ctx, imageData, data.from);
+
+        imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        outHistCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height)
+        drawHistogram(imageData, outHistogramCanvas);
+      }
+      //console.log(data);
     }
   });
 }
@@ -165,6 +194,23 @@ function findMax(array) {
   return max;
 }
 
+function logarithmCorrection(ctx, imageData, c) {
+  for(var i = 0; i < imageData.height; i++) {
+    for(var j = 0; j < imageData.width; j++) {
+      var pixel = getPixel(imageData, j, i);
+      pixel.red = logarithmTransformation(pixel.red, c);
+      pixel.green = logarithmTransformation(pixel.green, c);
+      pixel.blue = logarithmTransformation(pixel.blue, c);
+      setPixel(imageData, j, i, pixel);
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
+}
+
+function logarithmTransformation(value, c) {
+  return c * Math.log(1 + value);
+}
+
 function gammaCorrection(ctx, imageData, gamma) {
   for(var i = 0; i < imageData.height; i++) {
     for(var j = 0; j < imageData.width; j++) {
@@ -179,7 +225,7 @@ function gammaCorrection(ctx, imageData, gamma) {
 }
 
 function gammaTransformation(value, gamma) {
-  var correction = 1 / gamma;
+  var correction = 1 / gamma; // from dark to light
   return 255 * Math.pow(value / 255, correction);
 }
 
