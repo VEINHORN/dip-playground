@@ -72,11 +72,10 @@ function linearCorrection(imageData) {
   for(var i = 0; i < height; i++) {
     for(var j = 0; j < width; j++) {
       var pixel = getPixel(data, j, i);
-      pixel.red -= 100;
-      pixel.green -= 100;
-      pixel.blue -= 100;
+      pixel.red = 0;
+      pixel.green = 0;
+      //pixel.blue = 0;
       setPixel(data, j, i, pixel);
-      //setPixel(data, j, i, new Pixel(5, 10, 15, 255))
     }
   }
   context.putImageData(imageData, 0, 0);
@@ -88,11 +87,7 @@ function createHistogram(data, w, h) {
   for(var i = 0; i < h; i++) {
     for(var j = 0; j < w; j++) {
       var pixel = getPixel(data, j, i);
-      /*
-      histogram[pixel.red]++;
-      histogram[pixel.green]++;
-      histogram[pixel.blue]++;*/
-      histogram[Math.round(0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue)]++; //Y' =  0.299 R' + 0.587 G' + 0.114 B'
+      histogram[Math.round(0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue)]++;
     }
   }
   return histogram;
