@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <title>Digital image processing</title>
+    <link rel="stylesheet" type="text/css" href="index.css">
+  </head>
+  <body>
+    <div id="wrapper">
+      <div>
+        <img src="images/lenna.png">
+      </div>
+      <div>
+        <canvas id="viewport" width="512" height="512"></canvas>
+      </div>
+    </div>
+    <div id="histogram_wrapper">
+      <div>
+        <canvas class="histogram" id="input_histogram" width="255" height="150" style="background: red;"></canvas>
+      </div>
+      <div>
+        <canvas class="histogram" id="output_histogram" width="255" height="150" style="background: red;"></canvas>
+      </div>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>

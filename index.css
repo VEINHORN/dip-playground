@@ -1,0 +1,29 @@
+#wrapper div {
+  width: 2000px;
+  height: auto;
+  display: inline;
+}
+
+#histogram_wrapper div {
+  display: inline;
+}
+
+#input_histogram {
+  position: absolute;
+  top: 524;
+  bottom: 0;
+  left: 8;
+  right: 0;
+}
+
+#output_histogram {
+  position: absolute;
+  top: 524;
+  bottom: 0;
+  left: 271;
+  right: 0;
+}
+
+.histogram {
+  
+}
