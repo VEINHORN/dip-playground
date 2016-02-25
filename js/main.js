@@ -4,8 +4,8 @@ var canvas = document.getElementById("viewport");
 var inpHistogramCanvas = document.getElementById("input_histogram");
 var outHistogramCanvas = document.getElementById("output_histogram");
 
-//var image_path = "images/lenna.png";
-var image_path = "images/water.jpg";
+var image_path = "images/lenna.png";
+//var image_path = "images/water.jpg";
 
 window.onload = function() {
   var imgElm = document.getElementById("input-image");
@@ -31,8 +31,36 @@ window.onload = function() {
   }*/
   loadBtn.onclick = function() {
     var ctx = canvas.getContext("2d");
+    var histoCtx = outHistogramCanvas.getContext("2d");
+
+    histoCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
     loadImage();
+  }
+
+  var grayBtn = document.getElementById("gray-btn");
+  grayBtn.onclick = function() {
+    var ctx = canvas.getContext("2d");
+    var histoCtx = outHistogramCanvas.getContext("2d");
+    histoCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    var image = new Image();
+    image.src = image_path;
+
+    image.onload = function() {
+      canvas.width = image.width;
+      canvas.height = image.height;
+      ctx.drawImage(image, 0, 0);
+
+      var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      grayscale(ctx, imageData);
+      imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      drawHistogram(imageData, outHistogramCanvas);
+      console.log("grayscale");
+    }
   }
 
   $("#linear-correction-slider").ionRangeSlider({
@@ -192,6 +220,20 @@ function findMax(array) {
     if(max < array[i]) max = array[i];
   }
   return max;
+}
+
+function grayscale(ctx, imageData) {
+  for(var i = 0; i < imageData.height; i++) {
+    for(var j = 0; j < imageData.width; j++) {
+      var pixel = getPixel(imageData, j, i);
+      var gray = 0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue;
+      pixel.red = gray;
+      pixel.green = gray;
+      pixel.blue = gray;
+      setPixel(imageData, j, i, pixel);
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
 }
 
 function logarithmCorrection(ctx, imageData, c) {
