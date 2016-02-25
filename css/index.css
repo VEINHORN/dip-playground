@@ -20,3 +20,8 @@ input {
   position: absolute;
   margin-left: 10px;
 }
+
+#filters-wrapper {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
