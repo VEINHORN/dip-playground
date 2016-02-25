@@ -256,13 +256,9 @@ function threshold(ctx, imageData, thresholdVal) {
       var pixel = getPixel(imageData, j, i);
       var gray = 0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue;
       if(gray <= thresholdVal) {
-        pixel.red = 0;
-        pixel.green = 0;
-        pixel.blue = 0;
+        pixel.red = pixel.green = pixel.blue = 0;
       } else {
-        pixel.red = 255;
-        pixel.green = 255;
-        pixel.blue = 255;
+        pixel.red = pixel.green = pixel.blue = 255;
       }
       setPixel(imageData, j, i, pixel);
     }
@@ -275,9 +271,7 @@ function grayscale(ctx, imageData) {
     for(var j = 0; j < imageData.width; j++) {
       var pixel = getPixel(imageData, j, i);
       var gray = 0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue;
-      pixel.red = gray;
-      pixel.green = gray;
-      pixel.blue = gray;
+      pixel.red = pixel.green = pixel.blue = gray;
       setPixel(imageData, j, i, pixel);
     }
   }
