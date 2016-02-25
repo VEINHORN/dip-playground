@@ -149,6 +149,34 @@ window.onload = function() {
       //console.log(data);
     }
   });
+
+  $("#binary-correction-slider").ionRangeSlider({
+    grid: true,
+    from: 128,
+    step: 1,
+    min: 0,
+    max: 255,
+    onChange: function(data) {
+      var ctx = canvas.getContext("2d");
+      var outHistCtx = outHistogramCanvas.getContext("2d"); // context of output histogram
+      var image = new Image();
+      image.src = image_path;
+
+      image.onload = function() {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        ctx.drawImage(image, 0, 0);
+
+        var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        threshold(ctx, imageData, data.from);
+
+        imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        outHistCtx.clearRect(0, 0, outHistogramCanvas.width, outHistogramCanvas.height)
+        drawHistogram(imageData, outHistogramCanvas);
+      }
+      //console.log(data);
+    }
+  });
 }
 
 function loadImage() {
@@ -220,6 +248,26 @@ function findMax(array) {
     if(max < array[i]) max = array[i];
   }
   return max;
+}
+
+function threshold(ctx, imageData, thresholdVal) {
+  for(var i = 0; i < imageData.height; i++) {
+    for(var j = 0; j < imageData.width; j++) {
+      var pixel = getPixel(imageData, j, i);
+      var gray = 0.299 * pixel.red + 0.587 * pixel.green + 0.114 * pixel.blue;
+      if(gray <= thresholdVal) {
+        pixel.red = 0;
+        pixel.green = 0;
+        pixel.blue = 0;
+      } else {
+        pixel.red = 255;
+        pixel.green = 255;
+        pixel.blue = 255;
+      }
+      setPixel(imageData, j, i, pixel);
+    }
+  }
+  ctx.putImageData(imageData, 0, 0);
 }
 
 function grayscale(ctx, imageData) {
